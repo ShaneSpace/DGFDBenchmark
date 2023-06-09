@@ -1,0 +1,39 @@
+# 2023/03/13
+reference: Causal Consistency Network_A Collaborative Multi-machine Generalization Method for Bearing Fault Diagnosis, Lijie
+dataset_type: fan # bearing or fan
+fan_section: sec00 # sec00, sec01, sec02
+dataset_debug: False
+use_cuda: True
+device: cpu
+# Bearing dataset setting
+use_angular_resample: True
+use_fft: False # input data form (raw original signal or frequency spectrum)
+use_hilbert_envelope: True
+use_domain_weight: True
+data_length: 2560
+unified_Os: 350 # the number of sampling points per rad
+
+
+# basic model parameters
+batch_size: 64 #32 for fan, 64 for bearing
+num_classes: 2 # 类别数目，3或者4，当为3时，排除滚动体故障类别
+
+
+# basic training parameters
+steps: 200 # 参数的更新次数，mini-batch SGD中，每输入一个batch，更新一次参数
+checkpoint_freq: 1 # 每更新checkpoint_freq个batch,对test dataloader进行推理1次
+# weight_decay: 0.0001
+lr: 0.0001
+
+lbda_cc: 1
+lbda_ct: 1
+
+
+
+
+
+
+
+
+
+

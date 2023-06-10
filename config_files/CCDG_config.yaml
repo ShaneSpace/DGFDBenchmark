@@ -1,0 +1,39 @@
+# 2023/03/17
+reference: Conditional Constrastive domain generalization for fault diagnosis
+dataset_type: bearing # bearing or fan
+fan_section: sec00 # sec00, sec01, sec02
+dataset_debug: False
+use_cuda: True
+device: cpu
+use_fft: False # input data should be 2D FFT signal
+use_hilbert_envelope: True
+use_domain_weight: False
+data_length: 2560
+unified_fs: 10240 # 10240
+unified_Os: 350 # the number of sampling points per rad
+use_angular_resample: True
+
+
+
+# basic model parameters
+batch_size: 64 # 32 for fan, 64 for bearing
+num_classes: 3 # 2 for fan, 3 for bearing
+# num_domains: 8
+
+
+# basic training parameters
+steps: 200 # the number of iteration, 200 for bearing and 100 for fan (because the fan dataset is small)
+checkpoint_freq: 1
+lr: 0.001
+m0: 0
+m1: 100
+
+
+
+
+
+
+
+
+
+

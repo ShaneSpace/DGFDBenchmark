@@ -116,3 +116,140 @@ class Network_fan(nn.Module):
         return x7
 ###########
 ###########
+class FeatureGenerator_bearing(nn.Module):
+    '''
+    test code:
+    the_model = FeatureGenerator()
+    x = torch.randn((5,1,1024))
+    y = the_model(x)
+    print(y.shape)
+    torch.Size([5, 3520])
+    '''
+    def __init__(self, configs):
+        super().__init__()
+        self.configs = configs
+        self.num_classes = configs.num_classes
+        self.conv1 = Conv1dBlock(in_chan=1, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool1 = nn.MaxPool1d(2)
+
+        self.conv2 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool2 = nn.MaxPool1d(2)
+
+        self.conv3 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=32, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool3 = nn.MaxPool1d(2)
+
+        self.conv4 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=16, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool4 = nn.MaxPool1d(2)
+
+        self.conv5 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=5, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool5 = nn.MaxPool1d(2)
+
+        self.flatten = nn.Flatten()
+
+    def forward(self, x):
+        x1 = self.pool1(self.conv1(x ))
+        x2 = self.pool2(self.conv2(x1))
+        x3 = self.pool3(self.conv3(x2))
+        x4 = self.pool4(self.conv4(x3))
+        x5 = self.pool5(self.conv5(x4))
+        x6 = self.flatten(x5)
+        return x6
+
+class FaultClassifier_bearing(nn.Module):
+    def __init__(self, configs):
+        super().__init__()
+        self.configs = configs
+        self.num_classes = configs.num_classes
+
+        self.linear1 = nn.Linear(in_features = 1984, out_features = 300)
+        self.linear2 = nn.Linear(in_features = 300, out_features = self.num_classes)
+
+    def forward(self,x):
+        x1 = self.linear1(x)
+        x2 = self.linear2(x1)
+
+        return x2
+
+class DomainClassifier_bearing(nn.Module):
+    def __init__(self, configs):
+        super().__init__()
+        self.configs = configs
+        self.num_domains = len(configs.datasets_src)
+
+        self.linear1 = nn.Linear(in_features = 1984, out_features = 300)
+        self.linear2 = nn.Linear(in_features = 300, out_features =  self.num_domains)
+
+    def forward(self, x):
+        x1 = self.linear1(x)
+        x2 = self.linear2(x1)
+
+        return x2
+
+
+class FeatureGenerator_fan(nn.Module):
+    '''
+    test code:
+    the_model = FeatureGenerator()
+    x = torch.randn((5,1,1024))
+    y = the_model(x)
+    print(y.shape)
+    torch.Size([5, 3520])
+    '''
+    def __init__(self, configs):
+        super().__init__()
+        self.configs = configs
+        self.num_classes = configs.num_classes
+        self.conv1 = Conv1dBlock(in_chan=1, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool1 = nn.MaxPool1d(4)
+
+        self.conv2 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool2 = nn.MaxPool1d(4)
+
+        self.conv3 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool3 = nn.MaxPool1d(4)
+
+        self.conv4 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool4 = nn.MaxPool1d(2)
+
+        self.conv5 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool5 = nn.MaxPool1d(2)
+
+        self.flatten = nn.Flatten()
+
+    def forward(self, x):
+        x1 = self.pool1(self.conv1(x ))
+        x2 = self.pool2(self.conv2(x1))
+        x3 = self.pool3(self.conv3(x2))
+        x4 = self.pool4(self.conv4(x3))
+        x5 = self.pool5(self.conv5(x4))
+        x6 = self.flatten(x5)
+        return x6
+
+class FaultClassifier_fan(nn.Module):
+    def __init__(self, configs):
+        super().__init__()
+        self.configs = configs
+        self.num_classes = configs.num_classes
+
+        self.linear1 = nn.Linear(in_features=640, out_features=300)
+        self.linear2 = nn.Linear(in_features=300, out_features=self.num_classes)
+
+    def forward(self,x):
+        x1 = self.linear1(x)
+        x2 = self.linear2(x1)
+        return x2
+
+class DomainClassifier_fan(nn.Module):
+    def __init__(self, configs):
+        super().__init__()
+        self.configs = configs
+        self.num_domains = len(configs.datasets_src)
+
+        self.linear1 = nn.Linear(in_features = 640, out_features = 300)
+        self.linear2 = nn.Linear(in_features = 300, out_features =  self.num_domains)
+
+    def forward(self, x):
+        x1 = self.linear1(x)
+        x2 = self.linear2(x1)
+
+        return x2

@@ -11,7 +11,7 @@ class GenReport():
         self.saved_path = saved_path
         self.document = Document()
         self.current_time = time.ctime()
-        self.document.add_heading('Tune Report', level=0) # level=0，the title of the document
+        self.document.add_heading('DGFDBenchmark Tune Report', level=0) # level=0，文档标题
         self.document.add_paragraph('Report Date:'+ self.current_time)
 
     def _gen_figure(self, loss_acc_result):
@@ -20,19 +20,29 @@ class GenReport():
         '''
         fig1 = plt.figure()
         ax1 = fig1.add_axes([0,0,1,1])
-        l11 = ax1.plot(loss_acc_result['loss_cc'],'y-')
-        l12 = ax1.plot(loss_acc_result['loss_ct'],'g-')
-        l13 = ax1.plot(loss_acc_result['loss_cl'],'m-')
+        loss_keys=[]
+        for key in loss_acc_result.keys():
+            if key.__contains__('loss'):
+                ax1.plot(loss_acc_result[key])
+                loss_keys.append(key)
+        # l11 = ax1.plot(loss_acc_result['loss_rr'],'y-')
+        # l12 = ax1.plot(loss_acc_result['loss_cd'],'g-')
+        # l13 = ax1.plot(loss_acc_result['loss_ca'],'m-')
         # l14 = ax1.plot(loss_acc_result['loss_cl'],'b-')
         # l15 = ax1.plot(loss_acc_result['loss_rr'] + loss_acc_result['loss_cd']+ loss_acc_result['loss_ca']+ loss_acc_result['loss_cl'],'r-')
-        ax1.legend(labels = ('loss_cc', 'loss_ct','loss_cl'))#, 'total loss'))
-        ax1.set_title('Loss value')
+        # ax1.legend(labels = ('loss_rr', 'loss_cd', 'loss_ca', 'loss_cl', 'total loss'))
+        ax1.legend(labels = tuple(loss_keys))
+
+        ax1.set_title('Loss Curves')
         ax1.set_xlabel('Steps')
         ax1.set_ylabel('Loss')
         ax1.grid(True)
+        #https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.legend.html
         fig2 = plt.figure()
         acces = loss_acc_result['acces']
         ax2 = fig2.add_axes([0,0,1,1])
+        # l21 = ax2.plot(acces[:,0],'ys-')
+        # l22 = ax2.plot(acces[:,1],'go--')
         l21 = ax2.plot(acces[:,0],'ys-')
         l22 = ax2.plot(np.mean(acces[:,1:],1),'go--')
 
@@ -57,7 +67,8 @@ class GenReport():
         for k, v in sorted(vars(configs).items()):
             cfg.append((k,v))
 
-        table = self.document.add_table(rows=len(cfg), cols=2)
+        # table = self.document.add_table(rows=len(cfg), cols=2)
+        table = self.document.add_table(rows=1, cols=2)
         hdr_cells = table.rows[0].cells # the header of the table
         hdr_cells[0].text = 'Parameter Name'
         hdr_cells[1].text = 'Parameter Value'

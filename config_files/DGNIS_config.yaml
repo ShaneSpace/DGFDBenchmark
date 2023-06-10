@@ -1,0 +1,38 @@
+# 2023/03/29
+reference: A domain generalization network combining invariance and specificity towards real-time intelligent fault diagnosis, ZHAO Chao, MSSP-2022
+dataset_debug: False
+dataset_type: fan # bearing or fan
+fan_section: sec00 # sec00, sec01, sec02
+use_cuda: True
+device: cpu
+use_hilbert_envelope: True
+use_domain_weight: False
+domain_weight_scale: 1.5
+use_fft: False # input data form (raw original signal or frequency spectrum)
+data_length: 2560
+unified_Os: 350 # 转轴每转一圈采样点的数目
+use_angular_resample: True
+
+# basic model parameters
+batch_size: 64 # 32 for fan, 64 for bearing
+num_classes: 3 # 2 for fan, 3 for bearing
+
+# basic training parameters
+steps: 200 # the number of iteration, 200 for bearing and 100 for fan (because the fan dataset is small)
+checkpoint_freq: 1
+
+lr: 1
+margin: 1
+
+lbda_cr: 100
+lbda_tp: 0.1
+
+
+
+
+
+
+
+
+
+

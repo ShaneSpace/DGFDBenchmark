@@ -429,3 +429,4 @@ class Discriminator_iedg_fan(nn.Module):
         x3 = self.linear3(x2)
 
         return x3
+

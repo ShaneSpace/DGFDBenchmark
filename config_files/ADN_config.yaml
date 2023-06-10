@@ -1,0 +1,32 @@
+reference: Domain Generalization in rotating machinery fault diagnosis using deep neural networks, Lixiang, Neurocpmputing
+dataset_type: bearing # bearing or fan
+fan_section: sec00 # sec00, sec01, sec02
+device: 'cpu'
+use_cuda: True
+# configs about dataset reading
+dataset_debug: False
+use_fft: False # input data form (raw original signal or frequency spectrum)
+use_hilbert_envelope: True
+use_domain_weight: False
+data_length: 2560
+use_angular_resample: True
+unified_Os: 350 # the number of sampling points per rad
+
+
+dim_feature: 1984 #640 #1984
+num_classes: 3
+
+# basic model parameters
+batch_size: 64 #128
+num_classes: 3 # 类别数目，3或者4，当为3时，排除滚动体故障类别
+steps: 200 # 参数的更新次数，mini-batch SGD中，每输入一个batch，更新一次参数
+checkpoint_freq: 1 # 每更新checkpoint_freq个batch,对test dataloader进行推理1次
+lbda_cl: 1
+lbda_dc: 1
+lbda_dm: 1
+
+#############
+lr: 0.0001
+use_learning_rate_sheduler: True
+cos: False
+schedule: [100,150]

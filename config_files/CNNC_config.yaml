@@ -1,0 +1,40 @@
+# 2023/05/01
+reference: Learn Generalization Feature via Convolutional Neural Network_ A Fault Diagnosis Scheme Toward Unseen Operating Conditions
+dataset_type: bearing # bearing or fan
+fan_section: sec00 # sec00, sec01, sec02
+
+device: 'cpu'
+use_cuda: True
+# configs about dataset reading
+dataset_debug: False
+use_fft: False # input data form (raw original signal or frequency spectrum)
+use_hilbert_envelope: True
+data_length: 2560
+use_angular_resample: True
+unified_Os: 350  # the number of sampling points per rad
+
+
+# configs about prototype loss
+temperature: 10
+dim_feature: 1984 #128 #1984
+num_prototypes: 5
+num_classes: 3
+
+# basic model parameters
+batch_size: 64 # 32 for fan, 64 for bearing
+num_classes: 3 # 2 for fan, 3 for bearing
+
+
+# basic training parameters
+steps: 200 # the number of iteration, 200 for bearing and 100 for fan (because the fan dataset is small)
+checkpoint_freq: 1
+
+lbda_proto: 1
+
+
+#############
+lr: 0.0001
+lr_cent: 0.5
+use_learning_rate_sheduler: True
+cos: False
+schedule: [100,150]

@@ -558,3 +558,164 @@ class Discriminator_adn_fan(nn.Module):
 
         return x2
 
+#############
+class Encoder_cddg_bearing(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = Conv1dBlock(in_chan=1, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool1 = nn.MaxPool1d(2)
+
+        self.conv2 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool2 = nn.MaxPool1d(2)
+
+        self.conv3 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=32, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool3 = nn.MaxPool1d(2)
+
+        self.conv4 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=16, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool4 = nn.MaxPool1d(2)
+
+        self.conv5 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=5, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool5 = nn.MaxPool1d(2)
+
+        self.flatten = nn.Flatten()
+
+    def forward(self, x):
+        x1 = self.pool1(self.conv1(x ))
+        x2 = self.pool2(self.conv2(x1))
+        x3 = self.pool3(self.conv3(x2))
+        x4 = self.pool4(self.conv4(x3))
+        f_map = self.pool5(self.conv5(x4))
+        f_vec = self.flatten(f_map)
+        # print(x1.shape, x2.shape, x3.shape, x4.shape, f_map.shape)
+
+        return f_map, f_vec # f_map: feature maps (B,C,L); f_vec: feature vector (B, C*L)
+
+class Decoder_cddg_bearing(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.up1 = nn.Upsample(scale_factor=2, mode ='linear', align_corners=True)
+        self.conv1 = Conv1dBlock(in_chan=32*2, out_chan=32, kernel_size=5, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=4)
+        self.up2 = nn.Upsample(scale_factor=2, mode ='linear', align_corners=True)
+        self.conv2 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=15, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=15)
+        self.up3 = nn.Upsample(scale_factor=2, mode ='linear', align_corners=True)
+        self.conv3 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=31, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=31)
+        self.up4 = nn.Upsample(scale_factor=2, mode ='linear', align_corners=True)
+        self.conv4 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=63, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=63)
+        self.up5 = nn.Upsample(scale_factor=2, mode ='linear', align_corners=True)
+        self.conv5 = Conv1dBlock(in_chan=32, out_chan=32,  kernel_size=127, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=127)
+        #最后一层输出不加Activation
+        self.conv6 = Conv1dBlock(in_chan=32, out_chan=1,  kernel_size=127, stride=1, activation = 'none', norm='BN', pad_type='reflect', padding=63)
+
+
+    def forward(self, x):
+        '''
+        'x' is the feature maps
+        '''
+        x1 = self.conv1(self.up1(x ))
+        x2 = self.conv2(self.up2(x1))
+        x3 = self.conv3(self.up3(x2))
+        x4 = self.conv4(self.up4(x3))
+        x5 = self.conv5(self.up5(x4))
+        # print(x1.shape, x2.shape, x3.shape, x4.shape, x5.shape)
+        # >> torch.Size([5, 32, 128]) torch.Size([5, 32, 272]) torch.Size([5, 32, 576]) torch.Size([5, 32, 1216]) torch.Size([5, 32, 2560])
+
+        x_rec = self.conv6(x5)
+
+        return x_rec
+
+class Classifier_cddg_bearing(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.linear1 = nn.Linear(in_features=1984, out_features=300)
+        self.linear2 = nn.Linear(in_features=300, out_features=3)
+    def forward(self, x):
+        '''
+        'x' is the feature vector
+        '''
+        x1 = self.linear1(x)
+        x2 = self.linear2(x1)
+
+        return x2  # logits
+    def forward1(self,x):
+        x1 = self.linear1(x)
+        return x1
+
+class Encoder_cddg_fan(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.conv1 = Conv1dBlock(in_chan=1, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool1 = nn.MaxPool1d(4)
+
+        self.conv2 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool2 = nn.MaxPool1d(4)
+
+        self.conv3 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool3 = nn.MaxPool1d(4)
+
+        self.conv4 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool4 = nn.MaxPool1d(2)
+
+        self.conv5 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=0)
+        self.pool5 = nn.MaxPool1d(2)
+
+        self.flatten = nn.Flatten()
+
+    def forward(self, x):
+        x1 = self.pool1(self.conv1(x ))
+        x2 = self.pool2(self.conv2(x1))
+        x3 = self.pool3(self.conv3(x2))
+        x4 = self.pool4(self.conv4(x3))
+        f_map = self.pool5(self.conv5(x4)) # (B, 32, 20)
+        f_vec = self.flatten(f_map) # (B, 640)
+        # print(x1.shape, x2.shape, x3.shape, x4.shape, f_map.shape)
+
+        return f_map, f_vec # f_map: feature maps (B,C,L); f_vec: feature vector (B, C*L)
+
+
+class Decoder_cddg_fan(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.up1 = nn.Upsample(scale_factor=2, mode ='linear', align_corners=True) #(B,64, 40)
+        self.conv1 = Conv1dBlock(in_chan=32*2, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='zero', padding=63) #(B,32,103)
+        self.up2 = nn.Upsample(scale_factor=2, mode ='linear', align_corners=True) #(B,32,206)
+        self.conv2 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=64, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=64) #(B,32, 271)
+        self.up3 = nn.Upsample(scale_factor=4, mode ='linear', align_corners=True) #(B,32,1084)
+        self.conv3 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=127) #(B,32,1211)
+        self.up4 = nn.Upsample(scale_factor=4, mode ='linear', align_corners=True) #(B,32,4844)
+        self.conv4 = Conv1dBlock(in_chan=32, out_chan=32, kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=129) #(B,32,4975)
+        self.up5 = nn.Upsample(scale_factor=4, mode ='linear', align_corners=True) #(B,32,19900)
+        self.conv5 = Conv1dBlock(in_chan=32, out_chan=32,  kernel_size=128, stride=1, activation = 'lrelu', norm='BN', pad_type='reflect', padding=129)#(B,32,20031)
+        #最后一层输出不加Activation
+        self.conv6 = Conv1dBlock(in_chan=32, out_chan=1,  kernel_size=128, stride=1, activation = 'none', norm='BN', pad_type='reflect', padding=64)
+
+
+    def forward(self, x):
+        '''
+        'x' is the feature maps
+        '''
+        x1 = self.conv1(self.up1(x ))
+        x2 = self.conv2(self.up2(x1))
+        x3 = self.conv3(self.up3(x2))
+        x4 = self.conv4(self.up4(x3))
+        x5 = self.conv5(self.up5(x4))
+        # print(x1.shape, x2.shape, x3.shape, x4.shape, x5.shape)
+        # >> torch.Size([5, 32, 128]) torch.Size([5, 32, 272]) torch.Size([5, 32, 576]) torch.Size([5, 32, 1216]) torch.Size([5, 32, 2560])
+
+        x_rec = self.conv6(x5)
+
+        return x_rec
+
+class Classifier_cddg_fan(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        self.linear1 = nn.Linear(in_features=640, out_features=300)
+        self.linear2 = nn.Linear(in_features=300, out_features=2)
+    def forward(self, x):
+        '''
+        'x' is the feature vector
+        '''
+        x1 = self.linear1(x)
+        x2 = self.linear2(x1)
+
+        return x2  # logits

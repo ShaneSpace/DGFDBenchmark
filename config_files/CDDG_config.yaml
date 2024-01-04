@@ -1,0 +1,39 @@
+# 创建日期：2022-04-13
+reference: IDEA_test2_2023_04_13, Causal Disentanglement Domain Generalization for intelligent fault diagnosis
+dataset_type: fan # bearing or fan
+fan_section: sec00 # sec00, sec01, sec02
+use_cuda: True
+device: cpu
+# dataset
+dataset_debug: False
+use_fft: False # input data form (raw original signal or frequency spectrum)
+use_hilbert_envelope: True
+use_domain_weight: True
+data_length: 2560
+use_angular_resample: True
+unified_Os: 350 # 转轴每转一圈采样点的数目
+
+# training
+batch_size: 64 #128
+num_classes: 3 # 类别数目，3或者4，当为3时，排除滚动体故障类别
+steps: 200 # 参数的更新次数，mini-batch SGD中，每输入一个batch，更新一次参数
+checkpoint_freq: 1 # 每更新checkpoint_freq个batch,对test dataloader进行推理1次
+lr: 0.0001
+w_ca: 1
+w_rc: 1
+w_rr: 0.1
+
+
+use_learning_rate_sheduler: True
+cos: False #cosine连续递减方案性能太差
+# schedule: [20, 50, 100, 150]
+# gamma: 0.1 #0.5
+schedule: [50, 100, 150]
+gamma: 0.1 # 0.25 #0.5
+
+
+
+
+
+
+

@@ -9,5 +9,5 @@ Linshan Jia, Tommy W.S. Chow, Yixuan Yuan, Causal Disentanglement Domain General
 
 The dataset used in this paper can be downloaded from https://drive.google.com/file/d/1CZqD8YA8AqJGrc4jKXVL0kvdJcfkbFBX/view?usp=drive_link
 
-If you have any issues or questions, please contact me directly! [linshan.jia@my.cityu.edu.hk]
+If you have any issue or question, please contact me directly! [linshan.jia@my.cityu.edu.hk]
 
